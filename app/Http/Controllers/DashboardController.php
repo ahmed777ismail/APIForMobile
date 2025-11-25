@@ -7,7 +7,11 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\ForgetPassword;
+use App\Models\Brand;
+use App\Models\Orders;
+use App\Models\Product;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
 {
@@ -103,5 +107,25 @@ class DashboardController extends Controller
 
 
         return redirect()->back()->with('msg', 'Your Password is Updated Success');
+    }
+
+
+    public function dashboard()
+    {
+
+        $Brand = Brand::count('id');
+        $productInStock = Product::where('avalibale', '=', 1)->count('id');
+        $productOutStock = Product::where('avalibale', '=', 0)->count('id');
+
+        $limitedStock = Product::where('quantity', '<', 10)->latest()->paginate(10);
+        $sales = Orders::where('status', '=', true)->sum('price');
+
+        $salesPro = DB::table('orders')
+            ->join('products', 'orders.product_id', 'products.id')
+            ->select('orders.price', 'orders.quantity', 'products.pro_name', 'orders.created_at')
+            ->latest()
+            ->paginate(10);
+
+        return view('dashboard', compact('Brand', 'productInStock', 'productOutStock', 'limitedStock', 'sales', 'salesPro'));
     }
 }
