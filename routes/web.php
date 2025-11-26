@@ -9,6 +9,9 @@ use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
 
 Route::get('/', function () {
+
+    // $role = Role::create(['name' => 'user']);
+    // $permission = Permission::create(['name' => 'user']);
     return redirect()->route('login');
 });
 
